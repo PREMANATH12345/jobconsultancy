@@ -1,0 +1,230 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #db2777;
+  /* Pink-600 */
+  --color-secondary: #facc15;
+  /* Yellow-400 */
+  --color-tertiary: #10b981;
+  /* Green-500 (Emerald) */
+  --color-accent: #10b981;
+  --color-bg-white: #ffffff;
+  --color-card-light: #ffffff;
+}
+
+:root {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light;
+  background-color: #ffffff;
+  color: #000000;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: #ffffff;
+  background-image:
+    radial-gradient(circle at 0% 0%, rgba(219, 39, 119, 0.03) 0%, transparent 40%),
+    radial-gradient(circle at 100% 100%, rgba(234, 179, 8, 0.05) 0%, transparent 40%);
+  overflow-x: hidden;
+  color: #000000;
+}
+
+/* Glass & Card Styles */
+.glass {
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.glass-card {
+  background: #ffffff;
+  border: 1px solid #f1f1f1;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.04);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Card Padding & Radius */
+@media (min-width: 1024px) {
+  .glass-card {
+    border-radius: 3rem;
+    /* Reduced from 4rem */
+    padding: 2rem;
+    /* Reduced from 3rem */
+  }
+}
+
+@media (max-width: 767px) {
+  .glass-card {
+    border-radius: 1.5rem;
+    padding: 1.25rem;
+  }
+}
+
+.glass-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+  border-color: rgba(242, 116, 5, 0.3);
+}
+
+.font-serif {
+  font-family: 'Inter', sans-serif;
+}
+
+/* Updated Typography Scaling */
+@media (min-width: 1024px) {
+  .text-responsive-title {
+    font-size: 3.8rem;
+    font-weight: 800;
+  }
+
+  /* Reduced from 5rem */
+  .text-responsive-subtitle {
+    font-size: 1.25rem;
+    font-weight: 500;
+  }
+
+  /* Reduced from 1.75rem */
+  p {
+    font-size: 1.05rem;
+    font-weight: 400;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .text-responsive-title {
+    font-size: 3rem;
+    font-weight: 700;
+  }
+
+  .text-responsive-subtitle {
+    font-size: 1.15rem;
+  }
+
+  p {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .text-responsive-title {
+    font-size: 2rem;
+    font-weight: 700;
+  }
+
+  .text-responsive-subtitle {
+    font-size: 0.95rem;
+  }
+
+  p {
+    font-size: 0.85rem;
+  }
+}
+
+/* Button Sizing */
+.btn-primary {
+  @apply bg-primary text-white font-bold uppercase tracking-widest transition-all transform active:scale-95 shadow-xl hover:shadow-primary/30;
+}
+
+@media (min-width: 1024px) {
+  .btn-primary {
+    padding: 1.25rem 2.5rem;
+    font-size: 0.9rem;
+    border-radius: 2rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .btn-primary {
+    padding: 0.75rem 1.5rem !important;
+    /* Forces smaller buttons on mobile */
+    font-size: 0.75rem !important;
+    border-radius: 1rem !important;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #a3e635;
+  border-radius: 10px;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+/* Layout Widening */
+.max-w-7xl {
+  max-width: 1536px !important;
+  /* Widened from 1280px to reduce side margins */
+}
+
+/* Input Styles */
+input,
+select,
+textarea {
+  background: rgba(255, 255, 255, 0.8) !important;
+  color: #0f172a !important;
+  border: 1px solid #e2e8f0 !important;
+  padding: 0.75rem 1.25rem !important;
+  border-radius: 1rem !important;
+}
+
+.text-primary {
+  color: #db2777;
+}
+
+.bg-primary {
+  background-color: #db2777;
+}
+
+.text-slate-600 {
+  color: #475569;
+}
+
+.text-slate-900 {
+  color: #0f172a;
+}
+
+@keyframes bounce-subtle {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+.animate-bounce-subtle {
+  animation: bounce-subtle 2s infinite;
+}
