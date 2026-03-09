@@ -24,7 +24,7 @@ const EmployerProfileWeb = () => {
     });
 
     useEffect(() => {
-        const storedUser = JSON.parse(localStorage.getItem('user'));
+        const storedUser = JSON.parse(sessionStorage.getItem('user'));
         if (!storedUser || (storedUser.role !== 'employer' && storedUser.role !== 'admin')) {
             navigate('/login');
             return;
@@ -104,7 +104,9 @@ const EmployerProfileWeb = () => {
     };
 
     const handleLogout = () => {
-        localStorage.removeItem('user');
+        sessionStorage.removeItem('user');
+        sessionStorage.removeItem('token');
+        window.dispatchEvent(new Event('user-login'));
         navigate('/login');
     };
 

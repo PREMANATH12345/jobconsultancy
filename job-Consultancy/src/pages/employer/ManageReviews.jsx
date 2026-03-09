@@ -27,7 +27,7 @@ const ManageReviews = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [view, setView] = useState('list'); // 'list' or 'reviews'
 
-    const user = JSON.parse(localStorage.getItem('user'));
+    const user = JSON.parse(sessionStorage.getItem('user'));
 
     useEffect(() => {
         fetchJobs();

@@ -73,7 +73,7 @@ const ForgotPassword = () => {
     const labelClass = "text-xs font-black text-slate-900 uppercase tracking-widest ml-3 mb-2 block";
 
     return (
-        <div className="min-h-screen flex items-center justify-center pt-24 px-4 bg-slate-50">
+        <div className="min-h-screen flex items-center justify-center pt-24 px-4 bg-[#fffff4]">
             <div className="max-w-sm w-full p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem] shadow-xl border border-white bg-white/80 backdrop-blur-xl relative overflow-hidden">
 
 
@@ -102,9 +102,6 @@ const ForgotPassword = () => {
                         <div>
                             <label className={labelClass}>Registered Email</label>
                             <div className="relative">
-                                <div className="absolute left-5 inset-y-0 flex items-center pointer-events-none">
-                                    <Mail className="w-5 h-5 text-slate-300" />
-                                </div>
                                 <input
                                     required
                                     type="email"
@@ -113,7 +110,7 @@ const ForgotPassword = () => {
                                     onChange={handleChange}
                                     disabled={loading}
                                     placeholder="your@email.com"
-                                    className="w-full pl-14 pr-6 py-3 rounded-2xl bg-white border border-slate-200 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none text-slate-900 transition-all text-sm font-bold disabled:opacity-50"
+                                    className="w-full px-6 py-3 rounded-2xl bg-white border border-slate-200 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none text-slate-900 transition-all text-sm font-bold disabled:opacity-50"
                                 />
                             </div>
                         </div>
@@ -132,9 +129,6 @@ const ForgotPassword = () => {
                         <div>
                             <label className={labelClass}>Verification Code</label>
                             <div className="relative">
-                                <div className="absolute left-5 inset-y-0 flex items-center pointer-events-none">
-                                    <ShieldCheck className="w-5 h-5 text-slate-300" />
-                                </div>
                                 <input
                                     required
                                     type="text"
@@ -144,7 +138,7 @@ const ForgotPassword = () => {
                                     onChange={handleChange}
                                     disabled={loading}
                                     placeholder="Enter 6-digit code"
-                                    className="w-full pl-14 pr-6 py-3 rounded-2xl bg-white border border-slate-200 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none text-slate-900 transition-all text-sm font-bold disabled:opacity-50"
+                                    className="w-full px-6 py-3 rounded-2xl bg-white border border-slate-200 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none text-slate-900 transition-all text-sm font-bold disabled:opacity-50"
                                 />
                             </div>
                         </div>
@@ -163,9 +157,6 @@ const ForgotPassword = () => {
                         <div>
                             <label className={labelClass}>New Password</label>
                             <div className="relative">
-                                <div className="absolute left-5 inset-y-0 flex items-center pointer-events-none">
-                                    <Lock className="w-5 h-5 text-slate-300" />
-                                </div>
                                 <input
                                     required
                                     type={showNewPassword ? "text" : "password"}
@@ -174,7 +165,7 @@ const ForgotPassword = () => {
                                     onChange={handleChange}
                                     disabled={loading}
                                     placeholder="••••••••"
-                                    className="w-full pl-14 pr-12 py-3 rounded-2xl bg-white border border-slate-200 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none text-slate-900 transition-all text-sm font-bold disabled:opacity-50"
+                                    className="w-full pl-6 pr-12 py-3 rounded-2xl bg-white border border-slate-200 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none text-slate-900 transition-all text-sm font-bold disabled:opacity-50"
                                 />
                                 <button
                                     type="button"
@@ -188,9 +179,6 @@ const ForgotPassword = () => {
                         <div>
                             <label className={labelClass}>Confirm Password</label>
                             <div className="relative">
-                                <div className="absolute left-5 inset-y-0 flex items-center pointer-events-none">
-                                    <Lock className="w-5 h-5 text-slate-300" />
-                                </div>
                                 <input
                                     required
                                     type={showConfirmPassword ? "text" : "password"}
@@ -199,7 +187,7 @@ const ForgotPassword = () => {
                                     onChange={handleChange}
                                     disabled={loading}
                                     placeholder="••••••••"
-                                    className="w-full pl-14 pr-12 py-3 rounded-2xl bg-white border border-slate-200 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none text-slate-900 transition-all text-sm font-bold disabled:opacity-50"
+                                    className="w-full pl-6 pr-12 py-3 rounded-2xl bg-white border border-slate-200 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none text-slate-900 transition-all text-sm font-bold disabled:opacity-50"
                                 />
                                 <button
                                     type="button"

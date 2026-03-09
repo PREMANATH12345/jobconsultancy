@@ -30,7 +30,7 @@ const EmployerProfile = () => {
     });
 
     useEffect(() => {
-        const storedUser = JSON.parse(localStorage.getItem('user'));
+        const storedUser = JSON.parse(sessionStorage.getItem('user'));
         if (!storedUser || storedUser.role !== 'employer') {
             navigate('/login');
             return;

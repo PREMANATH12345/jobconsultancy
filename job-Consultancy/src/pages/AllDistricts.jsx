@@ -15,7 +15,7 @@ const AllDistricts = () => {
     );
 
     return (
-        <div className="min-h-screen bg-slate-50 pt-32 pb-24 px-4">
+        <div className="min-h-screen bg-[#fffff4] pt-32 pb-24 px-4">
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
                 <div className="mb-12 flex flex-col md:flex-row md:items-center justify-between gap-8">

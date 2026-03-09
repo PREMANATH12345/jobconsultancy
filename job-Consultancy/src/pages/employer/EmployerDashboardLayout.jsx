@@ -26,7 +26,7 @@ const EmployerDashboardLayout = () => {
     const routerLocation = useLocation();
 
     // Immediate auth check
-    const storedUser = JSON.parse(localStorage.getItem('user'));
+    const storedUser = JSON.parse(sessionStorage.getItem('user'));
     if (!storedUser || storedUser.role !== 'employer') {
         return <Navigate to="/login" replace />;
     }
@@ -40,7 +40,20 @@ const EmployerDashboardLayout = () => {
 
     useEffect(() => {
         fetchNewApplicationsCount();
-    }, []);
+
+        // Listen for internal session changes (e.g., if Name is updated in Profile)
+        const syncSession = () => {
+            const freshUser = JSON.parse(sessionStorage.getItem('user'));
+            if (!freshUser) {
+                navigate('/login');
+            }
+        };
+
+        window.addEventListener('user-login', syncSession);
+        return () => {
+            window.removeEventListener('user-login', syncSession);
+        };
+    }, [navigate]);
 
     const fetchNewApplicationsCount = async () => {
         try {
@@ -65,7 +78,9 @@ const EmployerDashboardLayout = () => {
     };
 
     const handleLogout = () => {
-        localStorage.removeItem('user');
+        sessionStorage.removeItem('user');
+        sessionStorage.removeItem('token');
+        window.dispatchEvent(new Event('user-login'));
         navigate('/login');
     };
 

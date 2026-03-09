@@ -25,7 +25,7 @@ const EmployerDashboard = () => {
         pendingApprovals: 0
     });
     const [loading, setLoading] = useState(true);
-    const user = JSON.parse(localStorage.getItem('user'));
+    const user = JSON.parse(sessionStorage.getItem('user'));
 
     useEffect(() => {
         fetchStats();
@@ -130,7 +130,7 @@ const EmployerDashboard = () => {
                     <h3 className="text-lg md:text-xl font-bold text-slate-900 tracking-tight mb-2 uppercase md:normal-case">{t('updateProfilePrompt')}</h3>
                     <p className="text-xs md:text-sm font-medium text-slate-500 max-w-xs mb-6 md:mb-8">{t('companyInfoUpdate')}</p>
                     <button
-                        onClick={() => navigate('/dashboard/employer')}
+                        onClick={() => navigate('/employer/profile')}
                         className="bg-white text-primary px-6 py-3 md:px-8 md:py-4 rounded-xl font-extrabold text-[10px] md:text-xs uppercase tracking-widest hover:bg-slate-900 hover:text-white transition-all flex items-center gap-3 shadow-md"
                     >
                         {t('goToProfile')}

@@ -12,7 +12,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 const EmployeeDashboard = () => {
     const { t } = useLanguage();
     const navigate = useNavigate();
-    const [user] = useState(JSON.parse(localStorage.getItem('user')));
+    const [user] = useState(JSON.parse(sessionStorage.getItem('user')));
     const [stats, setStats] = useState({ applied: 0, shortlisted: 0, rejected: 0 });
     const [loading, setLoading] = useState(true);
     const [recentApps, setRecentApps] = useState([]);

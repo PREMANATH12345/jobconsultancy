@@ -21,7 +21,7 @@ const StaticCard = ({ children }) => (
 export const About = () => {
     const { t } = useLanguage();
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-[#fffff4]">
             <PageHero title={t('ourJourney')} subtitle={t('journeySubtitle')} />
             <div className="max-w-6xl mx-auto px-4 py-24">
                 <StaticCard>
@@ -42,7 +42,7 @@ export const About = () => {
 export const ServicesPage = () => {
     const { t } = useLanguage();
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-[#fffff4]">
             <PageHero title={t('globalSolutions')} subtitle={t('solutionsSubtitle')} />
             <div className="max-w-[1536px] mx-auto px-4 py-12 md:py-24 grid md:grid-cols-2 gap-8 md:gap-12">
                 <StaticCard>
@@ -101,7 +101,7 @@ export const ServicesPage = () => {
 export const PrivacyPolicy = () => {
     const { t } = useLanguage();
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-[#fffff4]">
             <PageHero title={t('privacyCore')} subtitle={t('privacySubtitle')} />
             <div className="max-w-6xl mx-auto px-4 py-24">
                 <StaticCard>
@@ -120,7 +120,7 @@ export const PrivacyPolicy = () => {
 export const TermsOfService = () => {
     const { t } = useLanguage();
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-[#fffff4]">
             <PageHero title={t('usageTerms')} subtitle={t('usageSubtitle')} />
             <div className="max-w-6xl mx-auto px-4 py-24">
                 <StaticCard>

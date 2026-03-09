@@ -21,6 +21,7 @@ export const MainSearchBar = ({ compact = false, className = '', isExpandedProp 
     const [showLocSuggestions, setShowLocSuggestions] = useState(false);
     const [activeInput, setActiveInput] = useState(null); // 'keyword' or 'location'
     const [dynamicLocations, setDynamicLocations] = useState([]);
+    const [dynamicTitles, setDynamicTitles] = useState([]);
 
     const dropdownRef = useRef(null);
     const containerRef = useRef(null);
@@ -73,27 +74,60 @@ export const MainSearchBar = ({ compact = false, className = '', isExpandedProp 
     };
 
     useEffect(() => {
+        const allTitles = Array.from(new Set([...jobTitles, ...dynamicTitles]));
         if (keyword.trim().length > 0) {
-            const filtered = jobTitles.filter(title =>
-                title.toLowerCase().includes(keyword.toLowerCase())
-            );
+            const searchLower = keyword.toLowerCase();
+            const filtered = allTitles.filter(title =>
+                title.toLowerCase().includes(searchLower)
+            ).sort((a, b) => {
+                const aStarts = a.toLowerCase().startsWith(searchLower);
+                const bStarts = b.toLowerCase().startsWith(searchLower);
+                if (aStarts && !bStarts) return -1;
+                if (!aStarts && bStarts) return 1;
+                return a.localeCompare(b);
+            });
             setSuggestions(filtered);
             setShowSuggestions(filtered.length > 0 && isExpanded);
         } else {
             setSuggestions([]);
             setShowSuggestions(false);
         }
-    }, [keyword, isExpanded]);
+    }, [keyword, isExpanded, dynamicTitles]);
+
+    const [hasFetched, setHasFetched] = useState(false);
 
     useEffect(() => {
+        if (!isExpanded || hasFetched) return;
+        
         const fetchLocations = async () => {
             try {
                 const data = await allService.getData('jobs');
                 if (Array.isArray(data)) {
                     const uniqueLocs = new Set();
-                    data.forEach(job => {
+                    const uniqueTitles = new Set();
+                    
+                    const validJobs = data.filter(job => {
+                        const statusStr = String(job.status || '').toLowerCase().trim();
+                        if (statusStr !== 'approved') return false;
+                        if (String(job.deleted_at) === '1') return false;
+                        if (!job.job_expiry || job.job_expiry === '0000-00-00 00:00:00') return true;
+                        try {
+                            const expiryDate = new Date(job.job_expiry);
+                            if (isNaN(expiryDate.getTime())) return true;
+                            return expiryDate > new Date();
+                        } catch (e) { return true; }
+                    });
+
+                    validJobs.forEach(job => {
                         const loc = String(job.location || '').trim();
                         const dist = String(job.district || '').trim();
+                        const title = String(job.title || '').trim();
+
+                        if (title && title.length > 2) {
+                            const capitalize = (str) => str.split(' ').map(w => w ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : '').join(' ');
+                            uniqueTitles.add(capitalize(title));
+                        }
+
                         // Only add valid strings that aren't already in TN_DISTRICTS
                         if (loc && loc.length > 2) {
                             const isDistrict = TN_DISTRICTS.some(d => d.toLowerCase() === loc.toLowerCase());
@@ -115,20 +149,29 @@ export const MainSearchBar = ({ compact = false, className = '', isExpandedProp 
                         }
                     });
                     setDynamicLocations(Array.from(uniqueLocs).sort());
+                    setDynamicTitles(Array.from(uniqueTitles).sort());
+                    setHasFetched(true);
                 }
             } catch (error) {
                 console.error("Failed to fetch jobs for location suggestions:", error);
             }
         };
         fetchLocations();
-    }, []);
+    }, [isExpanded]);
 
     useEffect(() => {
         const allLocations = [...TN_DISTRICTS, ...dynamicLocations];
         if (location.trim().length > 0) {
+            const searchLower = location.toLowerCase();
             const filtered = allLocations.filter(dist =>
-                dist.toLowerCase().includes(location.toLowerCase())
-            );
+                dist.toLowerCase().includes(searchLower)
+            ).sort((a, b) => {
+                const aStarts = a.toLowerCase().startsWith(searchLower);
+                const bStarts = b.toLowerCase().startsWith(searchLower);
+                if (aStarts && !bStarts) return -1;
+                if (!aStarts && bStarts) return 1;
+                return a.localeCompare(b);
+            });
             setLocSuggestions(filtered);
             if (filtered.length > 0 && isExpanded) {
                 setShowLocSuggestions(true);
@@ -173,6 +216,22 @@ export const MainSearchBar = ({ compact = false, className = '', isExpandedProp 
         setShowSuggestions(false);
     };
 
+    const getHighlightedText = (text, highlight) => {
+        if (!highlight.trim()) return <span>{text}</span>;
+        const parts = text.split(new RegExp(`(${highlight})`, 'gi'));
+        return (
+            <span>
+                {parts.map((part, i) => 
+                    part.toLowerCase() === highlight.toLowerCase() ? (
+                        <span key={i} className="text-[#ed145b] font-black">{part}</span>
+                    ) : (
+                        <span key={i}>{part}</span>
+                    )
+                )}
+            </span>
+        );
+    };
+
     const renderSearchInputs = (mode) => (
         <div className="flex flex-col w-full gap-2 relative">
             <div className={`
@@ -186,11 +245,11 @@ export const MainSearchBar = ({ compact = false, className = '', isExpandedProp 
                     <input
                         ref={keywordInputRef}
                         id="keyword-search-desktop"
-                        name="keyword-search-desktop"
+                        name="search_query_main"
                         type="text"
                         placeholder={t('searchJob')}
                         value={keyword}
-                        autoComplete="new-password"
+                        autoComplete="off"
                         onChange={(e) => {
                             setKeyword(e.target.value);
                             if (e.target.value.trim()) setError(false);
@@ -216,7 +275,7 @@ export const MainSearchBar = ({ compact = false, className = '', isExpandedProp 
                                     className="w-full px-6 py-2.5 text-left flex items-center gap-3 hover:bg-pink-50/50 transition-colors group"
                                 >
                                     <Search className="w-3.5 h-3.5 text-slate-300 group-hover:text-pink-500" />
-                                    <span className="text-[14px] font-bold text-slate-600 group-hover:text-pink-700">{title}</span>
+                                    <span className="text-[14px] font-bold text-slate-600 group-hover:text-pink-700">{getHighlightedText(title, keyword)}</span>
                                 </button>
                             ))}
                         </div>
@@ -272,11 +331,11 @@ export const MainSearchBar = ({ compact = false, className = '', isExpandedProp 
                     <input
                         ref={locationInputRef}
                         id="location-search-desktop"
-                        name="location-search-desktop"
+                        name="search_location_main"
                         type="text"
                         placeholder={t('searchLocation')}
                         value={location}
-                        autoComplete="new-password"
+                        autoComplete="off"
                         onChange={(e) => setLocation(e.target.value)}
                         onFocus={() => {
                             setShowLocSuggestions(true);
@@ -300,7 +359,7 @@ export const MainSearchBar = ({ compact = false, className = '', isExpandedProp 
                                     className="w-full px-6 py-2.5 text-left flex items-center gap-3 hover:bg-pink-50/50 transition-colors group"
                                 >
                                     <MapPin className="w-3.5 h-3.5 text-slate-300 group-hover:text-pink-500" />
-                                    <span className="text-[14px] font-bold text-slate-600 group-hover:text-pink-700">{dist}</span>
+                                    <span className="text-[14px] font-bold text-slate-600 group-hover:text-pink-700">{getHighlightedText(dist, location)}</span>
                                 </button>
                             ))}
                         </div>
@@ -349,11 +408,11 @@ export const MainSearchBar = ({ compact = false, className = '', isExpandedProp 
                         <input
                             ref={keywordInputRef}
                             id="mobile-designation-search"
-                            name="designation"
+                            name="search_query_mobile"
                             type="text"
                             placeholder="Enter skills, designations, companies"
                             value={keyword}
-                            autoComplete="new-password"
+                            autoComplete="off"
                             onFocus={() => setActiveInput('keyword')}
                             onChange={(e) => {
                                 e.stopPropagation();
@@ -391,7 +450,7 @@ export const MainSearchBar = ({ compact = false, className = '', isExpandedProp 
                                     className="w-full px-5 py-2.5 text-left flex items-center gap-3 hover:bg-slate-50 transition-colors outline-none border-b border-slate-50 last:border-0"
                                 >
                                     <div className="w-1.5 h-1.5 rounded-full bg-pink-400 shrink-0" />
-                                    <span className="text-[13px] font-bold text-slate-700">{title}</span>
+                                    <span className="text-[13px] font-bold text-slate-700">{getHighlightedText(title, keyword)}</span>
                                 </button>
                             ))}
                         </div>
@@ -446,11 +505,11 @@ export const MainSearchBar = ({ compact = false, className = '', isExpandedProp 
                         <input
                             ref={locationInputRef}
                             id="mobile-location-search"
-                            name="location"
+                            name="search_location_mobile"
                             type="text"
                             placeholder={t('searchLocation')}
                             value={location}
-                            autoComplete="new-password"
+                            autoComplete="off"
                             onFocus={() => {
                                 setActiveInput('location');
                                 setShowLocSuggestions(true);
@@ -486,7 +545,7 @@ export const MainSearchBar = ({ compact = false, className = '', isExpandedProp 
                                     className="w-full px-5 py-2.5 text-left flex items-center gap-3 hover:bg-slate-50 transition-colors outline-none border-b border-slate-50 last:border-0"
                                 >
                                     <div className="w-1.5 h-1.5 rounded-full bg-pink-400 shrink-0" />
-                                    <span className="text-[13px] font-bold text-slate-700">{dist}</span>
+                                    <span className="text-[13px] font-bold text-slate-700">{getHighlightedText(dist, location)}</span>
                                 </button>
                             ))}
                         </div>

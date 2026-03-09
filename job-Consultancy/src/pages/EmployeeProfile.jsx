@@ -42,7 +42,7 @@ const EmployeeProfile = ({ hideHeader = false }) => {
     });
 
     useEffect(() => {
-        const storedUser = JSON.parse(localStorage.getItem('user'));
+        const storedUser = JSON.parse(sessionStorage.getItem('user'));
         if (!storedUser || storedUser.role !== 'employee') {
             navigate('/login');
             return;
@@ -120,7 +120,7 @@ const EmployeeProfile = ({ hideHeader = false }) => {
             toast.success("Profile updated successfully!");
 
             const updatedUser = { ...user, name: formData.name };
-            localStorage.setItem('user', JSON.stringify(updatedUser));
+            sessionStorage.setItem('user', JSON.stringify(updatedUser));
             setUser(updatedUser);
             setIsEditing(false);
         } catch (error) {
@@ -181,7 +181,9 @@ const EmployeeProfile = ({ hideHeader = false }) => {
     };
 
     const handleLogout = () => {
-        localStorage.removeItem('user');
+        sessionStorage.removeItem('user');
+        sessionStorage.removeItem('token');
+        window.dispatchEvent(new Event('user-login'));
         navigate('/login');
     };
 
@@ -269,6 +271,7 @@ const EmployeeProfile = ({ hideHeader = false }) => {
                                         { label: 'Qualification', value: formData.education },
                                         { label: 'Experience Level', value: formData.experience.type },
                                         { label: 'Designation', value: formData.experience.designation },
+                                        { label: 'Last Salary', value: formData.experience.lastSalary ? `₹ ${formatIndianNumber(formData.experience.lastSalary)}` : 'None' },
                                         { label: 'Expected Salary', value: formData.expectations.expectedSalary ? `₹ ${formatIndianNumber(formData.expectations.expectedSalary)}` : null },
                                         { label: 'Desired Job', value: formData.expectations.job }
                                     ].map((item, idx) => (
@@ -388,22 +391,18 @@ const EmployeeProfile = ({ hideHeader = false }) => {
                                     </select>
                                 </div>
 
-                                {formData.experience.type === 'Experienced' && (
-                                    <>
-                                        <div className="col-span-1">
-                                            <label className={labelClass}>{t('currentDesignation')}</label>
-                                            <input className={inputClass} value={formData.experience.designation} onChange={(e) => setFormData({ ...formData, experience: { ...formData.experience, designation: e.target.value } })} />
-                                        </div>
-                                        <div className="col-span-1">
-                                            <label className={labelClass}>Years of Experience</label>
-                                            <input className={inputClass} value={formData.experience.years} onChange={(e) => setFormData({ ...formData, experience: { ...formData.experience, years: e.target.value } })} />
-                                        </div>
-                                        <div className="col-span-1">
-                                            <label className={labelClass}>{t('lastSalary')}</label>
-                                            <input className={inputClass} value={formData.experience.lastSalary} onChange={(e) => setFormData({ ...formData, experience: { ...formData.experience, lastSalary: e.target.value } })} />
-                                        </div>
-                                    </>
-                                )}
+                                <div className="col-span-1">
+                                    <label className={labelClass}>{t('currentDesignation')}</label>
+                                    <input className={inputClass} value={formData.experience.designation} onChange={(e) => setFormData({ ...formData, experience: { ...formData.experience, designation: e.target.value } })} />
+                                </div>
+                                <div className="col-span-1">
+                                    <label className={labelClass}>Years of Experience</label>
+                                    <input className={inputClass} value={formData.experience.years} onChange={(e) => setFormData({ ...formData, experience: { ...formData.experience, years: e.target.value } })} />
+                                </div>
+                                <div className="col-span-1">
+                                    <label className={labelClass}>{t('lastSalary')}</label>
+                                    <input className={inputClass} value={formData.experience.lastSalary} onChange={(e) => setFormData({ ...formData, experience: { ...formData.experience, lastSalary: e.target.value } })} />
+                                </div>
 
                                 <div className="col-span-1">
                                     <label className={labelClass}>{t('expectedSalary')}</label>

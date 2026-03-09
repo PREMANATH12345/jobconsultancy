@@ -46,7 +46,7 @@ const MyJobs = () => {
     const [currentPlanName, setCurrentPlanName] = useState('Basic');
 
     const navigate = useNavigate();
-    const user = JSON.parse(localStorage.getItem('user'));
+    const user = JSON.parse(sessionStorage.getItem('user'));
 
     useEffect(() => {
         fetchJobs();
@@ -149,6 +149,7 @@ const MyJobs = () => {
                             ...app,
                             candidate_name: candidateUser?.name || 'Unknown User',
                             candidate_email: candidateUser?.email || 'N/A',
+                            expectedSalary: userDetails?.expectations?.expectedSalary ? `₹ ${formatIndianNumber(userDetails.expectations.expectedSalary)}` : 'Negotiable',
                             passportPhoto: getFullUrl(documents.passportPhoto),
                             resume: getFullUrl(documents.resume)
                         };
@@ -213,20 +214,20 @@ const MyJobs = () => {
 
                         return {
                             id: app.id,
-                            applied_date: new Date(app.created_at).toLocaleDateString(),
+                            applied_date: new Date(app.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
                             status: app.status || 'applied',
                             candidate_name: candidate?.name || 'N/A',
                             candidate_email: candidate?.email || 'N/A',
-                            candidate_phone: details?.phone || candidate?.phone || 'N/A',
-                            whatsapp: details?.whatsapp || 'N/A',
-                            gender: details?.gender || 'N/A',
-                            dob: details?.dob || 'N/A',
-                            location: details?.location || 'N/A',
+                            candidate_phone: candidate?.phone || 'N/A',
+                            whatsapp: candidate?.whatsapp_no || candidate?.phone || 'N/A',
+                            gender: details?.gender || candidate?.gender || 'N/A',
+                            dob: details?.dob ? new Date(details.dob).toLocaleDateString('en-GB') : 'N/A',
+                            location: details?.address?.district || details?.address?.city || details?.location || 'N/A',
                             education: details?.education || 'N/A',
                             experience_type: details?.experience?.type || 'Fresher',
-                            designation: details?.experience?.designation || 'N/A',
-                            years_exp: details?.experience?.years || '0',
-                            last_salary: details?.experience?.lastSalary || 'N/A',
+                            designation: details?.experience?.type === 'Experienced' ? (details?.experience?.designation || 'N/A') : 'N/A',
+                            years_exp: details?.experience?.type === 'Experienced' ? (details?.experience?.years || '0') : '0',
+                            last_salary: details?.experience?.type === 'Experienced' ? (details?.experience?.lastSalary || 'N/A') : 'N/A',
                             expected_salary: details?.expectations?.expectedSalary || 'N/A',
                             preferred_spot: details?.expectations?.workPlace || 'N/A',
                             desired_role: details?.expectations?.job || 'N/A',
@@ -263,15 +264,15 @@ const MyJobs = () => {
             ];
 
             const rows = enrichedData.map(d => [
-                d.applied_date,
+                `="${d.applied_date}"`,
                 d.job_title,
                 d.category,
                 d.candidate_name,
                 d.candidate_email,
-                `="${d.candidate_phone}"`, // Force Excel to treat as text to keep leading zeros
+                `="${d.candidate_phone}"`,
                 `="${d.whatsapp}"`,
                 d.gender,
-                d.dob,
+                `="${d.dob}"`,
                 d.location,
                 d.education,
                 d.experience_type,
@@ -475,13 +476,13 @@ const MyJobs = () => {
                                         <Building2 className="w-5 h-5 text-primary" /> About Company
                                     </h3>
                                     <div className="space-y-3 md:space-y-4">
-                                        <div className="flex justify-between items-center text-[10px] md:text-sm">
-                                            <span className="text-slate-500 font-extrabold">Industry:</span>
-                                            <span className="font-extrabold text-slate-900">{job.company_industry || '-'}</span>
+                                        <div className="flex justify-between items-start gap-4 text-[10px] md:text-sm">
+                                            <span className="text-slate-500 font-extrabold shrink-0">Industry:</span>
+                                            <span className="font-extrabold text-slate-900 text-right">{job.company_industry || '-'}</span>
                                         </div>
-                                        <div className="flex justify-between items-center text-[10px] md:text-sm">
-                                            <span className="text-slate-500 font-extrabold">Company Type:</span>
-                                            <span className="font-extrabold text-slate-900">{job.company_type || 'Private Ltd'}</span>
+                                        <div className="flex justify-between items-start gap-4 text-[10px] md:text-sm">
+                                            <span className="text-slate-500 font-extrabold shrink-0">Company Type:</span>
+                                            <span className="font-extrabold text-slate-900 text-right">{job.company_type || 'Private Ltd'}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -604,6 +605,7 @@ const MyJobs = () => {
                                             </div>
                                         </div>
                                         <div className="flex flex-wrap items-center gap-x-4 md:gap-x-8 gap-y-1 text-[9px] md:text-xs font-semibold text-slate-400 tracking-wide">
+                                            <span className="flex items-center gap-1.5"><IndianRupee className="w-3.5 h-3.5 text-primary" /> {app.expectedSalary}</span>
                                             <span className="flex items-center gap-1.5"><Mail className="w-3.5 h-3.5 text-primary" /> {app.candidate_email}</span>
                                             <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5 text-primary" /> {new Date(app.created_at).toLocaleDateString()}</span>
                                         </div>

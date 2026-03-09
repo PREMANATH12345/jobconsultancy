@@ -20,7 +20,7 @@ const Login = () => {
 
     useEffect(() => {
         const checkExistingUser = () => {
-            const storedUserString = localStorage.getItem('user');
+            const storedUserString = sessionStorage.getItem('user');
             if (storedUserString) {
                 try {
                     const storedUser = JSON.parse(storedUserString);
@@ -35,17 +35,19 @@ const Login = () => {
                         // If role doesn't match known ones, stay on login
                     } else {
                         // Invalid user object, clear it
-                        localStorage.removeItem('user');
+                        sessionStorage.removeItem('user');
+                        sessionStorage.removeItem('token');
                     }
                 } catch (e) {
-                    localStorage.removeItem('user');
+                    sessionStorage.removeItem('user');
+                    sessionStorage.removeItem('token');
                 }
             }
         };
 
         checkExistingUser();
-        window.addEventListener('storage', checkExistingUser);
-        return () => window.removeEventListener('storage', checkExistingUser);
+        // Since we are using sessionStorage, we don't listen to 'storage' events for users anymore
+        return () => {};
     }, [navigate]);
 
     const handleChange = (e) => {
@@ -59,7 +61,7 @@ const Login = () => {
             const result = await allService.login(formData);
             if (result.success) {
                 toast.success(`${t('welcomeBack') || 'Welcome back!'} ${result.user.name}`, { icon: '🔓' });
-                localStorage.setItem('user', JSON.stringify(result.user));
+                sessionStorage.setItem('user', JSON.stringify(result.user));
                 window.dispatchEvent(new Event('user-login'));
 
                 if (result.user.role === 'admin') {
@@ -87,7 +89,7 @@ const Login = () => {
     const labelClass = "text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-4 mb-2 block";
 
     return (
-        <div className="min-h-screen flex items-center justify-center pt-24 px-4 bg-white relative overflow-hidden">
+        <div className="min-h-screen flex items-center justify-center pt-24 px-4 bg-[#fffff4] relative overflow-hidden">
             <div className={`absolute top-0 right-0 w-96 h-96 rounded-full -mr-48 -mt-48 blur-3xl opacity-50 transition-all duration-700 ${isEmployee ? 'bg-emerald-500/5' : 'bg-amber-500/5'}`} />
             <div className={`absolute bottom-0 left-0 w-96 h-96 rounded-full -ml-48 -mb-48 blur-3xl opacity-50 transition-all duration-700 ${isEmployee ? 'bg-emerald-500/5' : 'bg-amber-500/5'}`} />
 

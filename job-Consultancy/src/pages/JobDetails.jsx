@@ -17,7 +17,7 @@ const JobDetails = () => {
     const [loading, setLoading] = useState(true);
     const [applying, setApplying] = useState(false);
     const navigate = useNavigate();
-    const user = JSON.parse(localStorage.getItem('user'));
+    const user = JSON.parse(sessionStorage.getItem('user'));
 
     const [userApplication, setUserApplication] = useState(null);
     const [checkingApp, setCheckingApp] = useState(false);
@@ -204,7 +204,7 @@ const JobDetails = () => {
     const labelClass = "text-[9px] font-black text-slate-400 uppercase tracking-widest ml-4 mb-1.5 block";
 
     return (
-        <div className="pt-40 pb-20 px-4 min-h-screen bg-white">
+        <div className="pt-32 pb-20 px-4 min-h-screen bg-[#fffff4]">
             {/* Profile Completion Modal */}
             {showProfilePrompt && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md p-4 overflow-y-auto">
@@ -369,13 +369,13 @@ const JobDetails = () => {
             <div className="max-w-5xl mx-auto">
                 <button
                     onClick={() => navigate(-1)}
-                    className="inline-flex items-center gap-2 text-xs font-black text-slate-400 uppercase tracking-widest hover:text-primary transition-colors mb-10 cursor-pointer"
+                    className="inline-flex items-center gap-2 text-xs font-black text-slate-400 uppercase tracking-widest hover:text-primary transition-colors mb-6 cursor-pointer"
                 >
                     <ArrowLeft className="w-4 h-4" /> {t('backToListings')}
                 </button>
 
                 <div className="overflow-hidden">
-                    <div className="pb-12 relative">
+                    <div className="pb-6 relative">
                         <div className={`absolute top-0 right-0 w-64 h-64 bg-slate-50 rounded-full -mr-32 -mt-32 blur-3xl opacity-50`} />
                         <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-start relative z-10">
                             <div className="w-20 h-20 md:w-24 md:h-24 bg-black rounded-2xl md:rounded-3xl flex items-center justify-center p-4 shadow-lg shrink-0">
@@ -401,15 +401,15 @@ const JobDetails = () => {
                                             {!isGovernment && (
                                                 <>
                                                     <div className="flex items-center gap-2 text-slate-500 font-bold text-[10px] md:text-xs uppercase tracking-wide">
-                                                        <Clock className="w-4 h-4 text-pink-600" /> {job.shift || 'General Shift'}
+                                                        <Clock className="w-4 h-4 text-pink-600" /> {job.shift && job.shift !== '-' ? job.shift : 'Not Specified'}
                                                     </div>
                                                     <div className="flex items-center gap-2 text-slate-500 font-bold text-[10px] md:text-xs uppercase tracking-wide">
-                                                        <IndianRupee className="w-4 h-4 text-pink-600" /> {formatIndianNumber(job.salary_range)}
+                                                        <IndianRupee className="w-4 h-4 text-pink-600" /> {job.salary_range && job.salary_range !== '-' ? formatIndianNumber(job.salary_range) : 'Not Specified'}
                                                     </div>
                                                 </>
                                             )}
                                             <div className="flex items-center gap-2 text-slate-500 font-bold text-[10px] md:text-xs uppercase tracking-wide">
-                                                <User className={`w-4 h-4 ${isGovernment ? 'text-amber-600' : 'text-pink-600'}`} /> {job.experience || t('fresher')}
+                                                <User className={`w-4 h-4 ${isGovernment ? 'text-amber-600' : 'text-pink-600'}`} /> {job.experience && job.experience !== '-' ? job.experience : (isGovernment ? t('fresher') : 'Not Specified')}
                                             </div>
                                         </div>
                                     </div>
@@ -471,7 +471,7 @@ const JobDetails = () => {
                     </div>
 
                     <div className="grid md:grid-cols-3 gap-0 border-t border-slate-100">
-                        <div className="md:col-span-2 py-10 pr-0 md:pr-10 space-y-8">
+                        <div className="md:col-span-2 py-6 pr-0 md:pr-10 space-y-8">
                             {isGovernment ? (
                                 <div className="max-w-3xl space-y-12">
                                     {/* Blog Header Context */}
@@ -595,11 +595,11 @@ const JobDetails = () => {
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
                                             <div className="bg-white/50 p-4 rounded-2xl border border-pink-100">
                                                 <p className="text-[10px] md:text-xs font-bold text-pink-600 mb-1 capitalize">{t('experience')}</p>
-                                                <p className="font-bold text-slate-900 text-sm md:text-base">{job.experience}</p>
+                                                <p className="font-bold text-slate-900 text-sm md:text-base">{job.experience && job.experience !== '-' ? job.experience : 'Not Specified'}</p>
                                             </div>
                                             <div className="bg-white/50 p-4 rounded-2xl border border-pink-100">
                                                 <p className="text-[10px] md:text-xs font-bold text-pink-600 mb-1 capitalize">{t('jobTypeTag')}</p>
-                                                <p className="font-bold text-slate-900 text-sm md:text-base">{job.job_type}</p>
+                                                <p className="font-bold text-slate-900 text-sm md:text-base">{job.job_type && job.job_type !== '-' ? job.job_type : 'Not Specified'}</p>
                                             </div>
                                             {job.language && (
                                                 <div className="bg-white/50 p-4 rounded-2xl border border-pink-100 sm:col-span-2">
@@ -613,7 +613,7 @@ const JobDetails = () => {
                             )}
                         </div>
 
-                        <div className="py-10 md:pl-10 md:border-l border-slate-100 border-t md:border-t-0 space-y-6">
+                        <div className="py-6 md:pl-10 md:border-l border-slate-100 border-t md:border-t-0 space-y-6">
                             <div className="space-y-6">
                                 {!isGovernment && (
                                     <div>
@@ -621,13 +621,13 @@ const JobDetails = () => {
                                             <Building2 className="w-5 h-5 text-amber-600" /> {t('aboutCompany')}
                                         </h3>
                                         <div className="space-y-3">
-                                            <div className="flex justify-between items-center text-xs md:text-sm">
-                                                <span className="text-slate-500 font-bold">Industry:</span>
-                                                <span className="font-bold text-slate-900">{job.company_industry || '-'}</span>
+                                            <div className="flex justify-between items-start gap-4 text-xs md:text-sm">
+                                                <span className="text-slate-500 font-bold shrink-0">Industry:</span>
+                                                <span className="font-bold text-slate-900 text-right">{job.company_industry && job.company_industry !== '-' ? job.company_industry : 'Not Specified'}</span>
                                             </div>
-                                            <div className="flex justify-between items-center text-xs md:text-sm">
-                                                <span className="text-slate-500 font-bold">Company Type:</span>
-                                                <span className="font-bold text-slate-900">{job.company_type || 'Private Ltd'}</span>
+                                            <div className="flex justify-between items-start gap-4 text-xs md:text-sm">
+                                                <span className="text-slate-500 font-bold shrink-0">Company Type:</span>
+                                                <span className="font-bold text-slate-900 text-right">{job.company_type && job.company_type !== '-' ? job.company_type : 'Not Specified'}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -646,8 +646,8 @@ const JobDetails = () => {
                                             <span className="text-slate-500 font-bold">{isGovernment ? t('lastDate') + ':' : t('expires') + ':'}</span>
                                             <span className="font-bold text-slate-900">
                                                 {isGovernment 
-                                                    ? (job.last_date ? new Date(job.last_date).toLocaleDateString('en-GB') : 'N/A')
-                                                    : (job.application_deadline || (job.job_expiry && job.job_expiry !== '0000-00-00 00:00:00' ? new Date(job.job_expiry).toLocaleDateString('en-GB') : 'N/A'))}
+                                                    ? (job.last_date && job.last_date !== '0000-00-00 00:00:00' ? new Date(job.last_date).toLocaleDateString('en-GB') : 'Not Specified')
+                                                    : (job.application_deadline && job.application_deadline !== '-' ? job.application_deadline : (job.job_expiry && job.job_expiry !== '0000-00-00 00:00:00' ? new Date(job.job_expiry).toLocaleDateString('en-GB') : 'Not Specified'))}
                                             </span>
                                         </div>
                                         <div className="flex justify-between items-center text-xs md:text-sm">

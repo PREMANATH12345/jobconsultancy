@@ -37,7 +37,7 @@ const Contact = () => {
     const labelClass = "text-xs font-black text-slate-900 uppercase tracking-widest ml-3 mb-2 block";
 
     return (
-        <div className="min-h-screen pt-40 pb-20 px-4 bg-white">
+        <div className="min-h-screen pt-40 pb-20 px-4 bg-[#fffff4]">
             <div className="max-w-[1536px] mx-auto">
                 <div className="text-center mb-20 space-y-4">
                     <h1 className="text-2xl md:text-5xl font-extrabold text-slate-900 tracking-tight leading-none">{t('getInTouch')}</h1>

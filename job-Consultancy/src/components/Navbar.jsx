@@ -12,20 +12,18 @@ const Navbar = () => {
     const [isMobileSearchActive, setIsMobileSearchActive] = useState(false);
     const { language, setLanguage, t } = useLanguage();
     const location = useLocation();
-    const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
+    const [user, setUser] = useState(JSON.parse(sessionStorage.getItem('user')));
 
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 20);
-        const handleLoginUpdate = () => setUser(JSON.parse(localStorage.getItem('user')));
+        const handleLoginUpdate = () => setUser(JSON.parse(sessionStorage.getItem('user')));
 
         window.addEventListener('scroll', handleScroll, { passive: true });
         window.addEventListener('user-login', handleLoginUpdate);
-        window.addEventListener('storage', handleLoginUpdate);
 
         return () => {
             window.removeEventListener('scroll', handleScroll);
             window.removeEventListener('user-login', handleLoginUpdate);
-            window.removeEventListener('storage', handleLoginUpdate);
         };
     }, []);
 
@@ -110,7 +108,7 @@ const Navbar = () => {
                             {/* User Authentication */}
                             {user ? (
                                 <Link to={user.role === 'employer' ? "/employer/dashboard" : "/employee/dashboard"} className={`${user.role === 'employer' ? 'bg-primary' : 'bg-emerald-500'} text-white px-7 py-2.5 rounded-full text-sm font-bold shadow-lg hover:scale-105 transition-all whitespace-nowrap`}>
-                                    {user.role === 'employer' ? 'Employer Hub' : 'Candidate Portal'}
+                                    {user.role === 'employer' ? t('employerHub') : t('candidatePortal')}
                                 </Link>
                             ) : (
                                 <Link to="/login" className="bg-slate-900 text-white px-7 py-2.5 rounded-full text-sm font-bold shadow-lg hover:scale-105 transition-all flex items-center gap-2 ml-1">
@@ -123,7 +121,7 @@ const Navbar = () => {
                         <div className="flex lg:hidden items-center gap-2">
                             {user ? (
                                 <Link to={user.role === 'employer' ? "/employer/dashboard" : "/employee/dashboard"} className={`${user.role === 'employer' ? 'bg-primary' : 'bg-emerald-500'} text-white px-4 py-2 rounded-full text-[10px] font-bold shadow-md whitespace-nowrap`}>
-                                    {user.role === 'employer' ? 'Hub' : 'Portal'}
+                                    {user.role === 'employer' ? t('employerHub').split(' ')[0] : t('candidatePortal').split(' ')[0]}
                                 </Link>
                             ) : (
                                 <Link to="/login" className="bg-slate-900 text-white px-4 py-2 rounded-full text-[10px] font-bold shadow-md flex items-center gap-1.5">

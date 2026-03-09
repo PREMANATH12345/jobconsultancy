@@ -9,7 +9,18 @@ const ReviewsSection = () => {
     const [reviews, setReviews] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [loading, setLoading] = useState(true);
+    const [isPaused, setIsPaused] = useState(false);
+    const [touchStart, setTouchStart] = useState(0);
+    const [itemsPerView, setItemsPerView] = useState(window.innerWidth >= 1024 ? 3 : window.innerWidth >= 768 ? 2 : 1);
     const carouselRef = useRef(null);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setItemsPerView(window.innerWidth >= 1024 ? 3 : window.innerWidth >= 768 ? 2 : 1);
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     useEffect(() => {
         const fetchReviews = async () => {
@@ -71,30 +82,61 @@ const ReviewsSection = () => {
         fetchReviews();
     }, []);
 
+    const maxIndex = Math.max(0, reviews.length - itemsPerView);
+
     const nextSlide = () => {
-        if (reviews.length <= 3) return;
-        const totalPages = Math.ceil(reviews.length / 3);
-        setCurrentIndex((prev) => (prev + 1 >= totalPages ? 0 : prev + 1));
+        if (reviews.length <= itemsPerView) return;
+        setCurrentIndex((prev) => (prev >= maxIndex ? 0 : prev + 1));
     };
 
     const prevSlide = () => {
-        if (reviews.length <= 3) return;
-        const totalPages = Math.ceil(reviews.length / 3);
-        setCurrentIndex((prev) => (prev - 1 < 0 ? totalPages - 1 : prev - 1));
+        if (reviews.length <= itemsPerView) return;
+        setCurrentIndex((prev) => (prev <= 0 ? maxIndex : prev - 1));
+    };
+
+    useEffect(() => {
+        let interval;
+        if (reviews.length > itemsPerView && !isPaused) {
+            interval = setInterval(() => {
+                nextSlide();
+            }, 3000);
+        }
+        return () => clearInterval(interval);
+    }, [reviews.length, itemsPerView, isPaused, nextSlide]);
+
+    const handleTouchStart = (e) => {
+        setIsPaused(true);
+        setTouchStart(e.touches[0].clientX);
+    };
+
+    const handleTouchEnd = (e) => {
+        setIsPaused(false);
+        if (!touchStart) return;
+
+        const touchEnd = e.changedTouches[0].clientX;
+        const distance = touchStart - touchEnd;
+        const swipeThreshold = 50; // minimum distance to be considered a swipe
+
+        if (distance > swipeThreshold) {
+            nextSlide();
+        } else if (distance < -swipeThreshold) {
+            prevSlide();
+        }
+        setTouchStart(0);
     };
 
     if (loading || reviews.length === 0) return null;
 
     return (
-        <section className="py-12 md:py-24 bg-slate-50 overflow-hidden reveal-section px-4 text-left">
-            <div className="max-w-[1536px] mx-auto relative px-4 sm:px-12 lg:px-24">
+        <section className="py-8 md:py-12 bg-[#fffff4] overflow-hidden px-4 text-left">
+            <div className="max-w-[1400px] mx-auto relative px-4 sm:px-12 lg:px-24">
                 {/* Section Header */}
-                <div className="text-center mb-10 md:mb-20">
+                <div className="text-center mb-6 md:mb-10">
                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white text-emerald-600 border border-slate-100 shadow-sm mb-6">
                         <Sparkles className="w-4 h-4" />
                         <span className="text-[10px] font-black uppercase tracking-widest">{t('candidateSuccess')}</span>
                     </div>
-                    <h2 className="text-xl md:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight leading-none uppercase italic">
+                    <h2 className="text-lg md:text-2xl lg:text-3xl font-black text-slate-900 tracking-tight leading-none uppercase italic">
                         {t('voicesOfSuccess').split('Success')[0]} <span className="text-emerald-600 italic">{t('voicesOfSuccess').includes('Success') ? 'Success' : 'வெற்றி'}</span>
                     </h2>
                     <p className="mt-4 text-slate-500 font-bold text-sm md:text-lg lowercase max-w-2xl mx-auto leading-relaxed">
@@ -103,9 +145,9 @@ const ReviewsSection = () => {
                 </div>
 
                 <div className="relative group">
-                    {reviews.length > 3 && (
+                    {reviews.length > itemsPerView && itemsPerView > 1 && (
                         <>
-                            <div className="absolute top-1/2 -translate-y-1/2 -left-4 sm:-left-12 z-20">
+                            <div className="hidden md:flex absolute top-1/2 -translate-y-1/2 -left-4 sm:-left-12 z-20">
                                 <button
                                     onClick={prevSlide}
                                     className="w-14 h-14 rounded-2xl bg-white shadow-2xl border border-slate-100 flex items-center justify-center text-slate-400 hover:text-emerald-600 hover:scale-110 active:scale-95 transition-all outline-none"
@@ -113,7 +155,7 @@ const ReviewsSection = () => {
                                     <ChevronLeft className="w-6 h-6" />
                                 </button>
                             </div>
-                            <div className="absolute top-1/2 -translate-y-1/2 -right-4 sm:-right-12 z-20">
+                            <div className="hidden md:flex absolute top-1/2 -translate-y-1/2 -right-4 sm:-right-12 z-20">
                                 <button
                                     onClick={nextSlide}
                                     className="w-14 h-14 rounded-2xl bg-white shadow-2xl border border-slate-100 flex items-center justify-center text-slate-400 hover:text-emerald-600 hover:scale-110 active:scale-95 transition-all outline-none"
@@ -124,18 +166,25 @@ const ReviewsSection = () => {
                         </>
                     )}
 
-                    <div className="overflow-x-auto lg:overflow-hidden py-10 no-scrollbar">
+                    <div 
+                        className="overflow-hidden py-10 relative px-4"
+                        onMouseEnter={() => setIsPaused(true)}
+                        onMouseLeave={() => setIsPaused(false)}
+                        onTouchStart={handleTouchStart}
+                        onTouchEnd={handleTouchEnd}
+                    >
                         <div
-                            className="flex lg:transition-transform lg:duration-700 lg:ease-in-out"
-                            style={{ transform: window.innerWidth >= 1024 ? `translateX(-${currentIndex * 100}%)` : 'none' }}
+                            className="flex transition-transform duration-700 ease-in-out"
+                            style={{ 
+                                transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)` 
+                            }}
                         >
-                            {Array.from({ length: Math.ceil(reviews.length / 3) }).map((_, groupIdx) => (
-                                <div key={groupIdx} className="flex lg:grid lg:grid-cols-3 gap-8 px-4 w-auto lg:w-full shrink-0">
-                                    {reviews.slice(groupIdx * 3, groupIdx * 3 + 3).map((rev, i) => (
-                                         <div key={i} className="min-w-[280px] lg:min-w-0 flex-1 bg-white rounded-[2rem] p-5 lg:p-8 relative overflow-hidden group border-[3px] border-emerald-600/40 flex flex-col h-full hover:-translate-y-2 transition-all duration-500">
-                                             <div className="flex items-start justify-between mb-6 md:mb-8 relative z-10">
-                                                 <div className="flex items-center gap-3 md:gap-4 text-left">
-                                                     <div className="w-16 h-16 md:w-20 md:h-20 bg-slate-900 rounded-2xl flex items-center justify-center text-white border-4 border-slate-50 shadow-lg overflow-hidden shrink-0">
+                            {reviews.map((rev, i) => (
+                                <div key={i} className="px-3 shrink-0 transition-all duration-500" style={{ width: `${100 / itemsPerView}%` }}>
+                                         <div className="bg-white rounded-2xl p-6 md:p-8 lg:p-10 relative overflow-hidden px-4 md:px-6 lg:px-8 group border-2 border-emerald-600/20 flex flex-col h-full hover:border-emerald-600/40 transition-colors shadow-sm max-w-[420px] mx-auto">
+                                             <div className="flex items-start justify-between mb-3 md:mb-4 relative z-10">
+                                                 <div className="flex items-center gap-2 md:gap-3 text-left">
+                                                     <div className="w-10 h-10 md:w-14 md:h-14 bg-slate-100 rounded-xl flex items-center justify-center text-white border-2 border-white shadow-md overflow-hidden shrink-0">
                                                          <img
                                                              src={rev.user_photo || '/reviewfallback.png'}
                                                              alt={rev.user_name}
@@ -159,7 +208,7 @@ const ReviewsSection = () => {
                                             </div>
 
                                             <div className="flex-1 text-left relative z-10">
-                                                <p className="text-slate-600 font-bold text-sm leading-relaxed mb-8">
+                                                <p className="text-slate-600 font-bold text-[13px] md:text-sm leading-relaxed mb-4">
                                                     "{rev.comment}"
                                                 </p>
                                             </div>
@@ -173,17 +222,16 @@ const ReviewsSection = () => {
                                                 </p>
                                             </div>
 
-                                            <Quote className="absolute -bottom-4 -right-4 w-24 h-24 text-slate-50/50 group-hover:scale-110 group-hover:text-emerald-600/5 transition-all duration-700 pointer-events-none" />
+                                            <Quote className="absolute -bottom-4 -right-4 w-16 h-16 text-slate-50/50 group-hover:text-emerald-600/5 transition-opacity pointer-events-none" />
                                         </div>
-                                    ))}
                                 </div>
                             ))}
                         </div>
                     </div>
 
-                    {reviews.length > 3 && (
-                        <div className="flex justify-center gap-3 mt-8">
-                            {Array.from({ length: Math.ceil(reviews.length / 3) }).map((_, i) => (
+                    {reviews.length > itemsPerView && itemsPerView > 1 && (
+                        <div className="hidden md:flex justify-center gap-3 mt-8">
+                            {Array.from({ length: maxIndex + 1 }).map((_, i) => (
                                 <button
                                     key={i}
                                     onClick={() => setCurrentIndex(i)}

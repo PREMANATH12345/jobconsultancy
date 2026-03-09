@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ArrowRight, Briefcase, Users, CheckCircle, Search, TrendingUp, Sparkles, MapPin, Landmark } from 'lucide-react';
+import { ArrowRight, Briefcase, Users, CheckCircle, Search, TrendingUp, Sparkles, MapPin, Landmark, Globe, Award, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
 import { allService } from '../services/api';
@@ -13,10 +13,46 @@ import ReviewsSection from '../components/ReviewsSection';
 
 gsap.registerPlugin(ScrollTrigger);
 
+const CounterAnimated = ({ end, suffix = "", decimals = 0 }) => {
+    const [count, setCount] = useState(0);
+    const elementRef = useRef(null);
+
+    useEffect(() => {
+        let ctx = gsap.context(() => {
+            gsap.to({ val: 0 }, {
+                val: end,
+                duration: 2.5,
+                ease: "power3.out",
+                scrollTrigger: {
+                    trigger: elementRef.current,
+                    start: "top 90%",
+                    end: "bottom 10%",
+                    toggleActions: "restart none restart none",
+                },
+                onUpdate: function () {
+                    setCount(this.targets()[0].val);
+                }
+            });
+        }, elementRef);
+        return () => ctx.revert();
+    }, [end]);
+
+    return (
+        <span ref={elementRef}>
+            {count.toLocaleString(undefined, {
+                minimumFractionDigits: decimals,
+                maximumFractionDigits: decimals
+            })}
+            {suffix}
+        </span>
+    );
+};
+
 const Home = () => {
     const containerRef = useRef(null);
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const [jobs, setJobs] = useState([]);
+    const isTamil = language === 'ta';
 
     useEffect(() => {
         const fetchJobs = async () => {
@@ -88,12 +124,15 @@ const Home = () => {
     }, []);
 
     return (
-        <div ref={containerRef} className="page-container bg-white">
+        <div ref={containerRef} className="page-container bg-[#fffff4]">
             {/* Hero Section */}
-            <section
-                className="relative min-h-[90vh] lg:min-h-screen flex items-center pt-24 lg:pt-32 overflow-hidden px-4 mb-4 md:mb-10 bg-[url('/herobg-mobile.png')] md:bg-[url('/herobg.png')] bg-cover bg-center bg-scroll md:bg-fixed"
-            >
-                <div className="absolute inset-0 backdrop-blur-[4px] z-0 pointer-events-none"></div>
+            <section className="relative min-h-[90vh] lg:min-h-screen flex items-center pt-24 lg:pt-32 overflow-hidden px-4 mb-2 md:mb-4">
+                {/* Fixed Background Layer with stable blur */}
+                <div 
+                    className="absolute inset-0 z-0 bg-[url('/herobg-mobile.png')] md:bg-[url('/herobg.png')] bg-cover bg-center bg-no-repeat scale-105"
+                    style={{ filter: 'blur(2.5px) brightness(0.9)' }}
+                ></div>
+                <div className="absolute inset-0 bg-black/20 z-0 pointer-events-none"></div>
 
                 <div className="max-w-[1536px] mx-auto relative z-10 w-full px-4 md:px-8">
                     <div className="max-w-4xl space-y-6 md:space-y-10 hero-text-content [text-shadow:_0_4px_12px_rgba(0,0,0,0.8)]">
@@ -106,7 +145,7 @@ const Home = () => {
                         </div>
 
                         {/* Title */}
-                        <h1 className="text-4xl md:text-7xl lg:text-8xl font-black leading-[1.1] md:leading-[1.05] text-white tracking-tight drop-shadow-lg">
+                        <h1 className={`text-2xl md:text-4xl ${isTamil ? 'lg:text-4xl' : 'lg:text-6xl'} font-black leading-[1.2] md:leading-[1.1] text-white tracking-tight drop-shadow-lg`}>
                             {t('heroTitle').split(',')[0]} <br />
                             <span className="text-amber-500">{t('heroTitle').split(',')[1]}</span>
                         </h1>
@@ -116,20 +155,19 @@ const Home = () => {
                             {t('heroSubtitle')}
                         </p>
 
-                        {/* Buttons */}
                         <div className="flex flex-col sm:flex-row gap-4 md:gap-5 pt-4 md:pt-6">
                             <Link
                                 to="/employee-register"
-                                className="group bg-white text-slate-900 px-8 md:px-12 py-3.5 md:py-5 rounded-full font-black text-xs md:text-base uppercase tracking-widest flex items-center justify-center gap-2 md:gap-3 shadow-2xl hover:bg-amber-500 hover:text-white transition-all duration-300"
+                                className={`group bg-white text-slate-900 ${isTamil ? 'px-6 md:px-8 py-3 md:py-3.5 text-[10px] md:text-xs' : 'px-7 md:px-9 py-3 md:py-4 text-[10px] md:text-sm'} rounded-full font-black uppercase tracking-widest flex items-center justify-center gap-2 md:gap-3 shadow-2xl hover:bg-amber-500 hover:text-white transition-all duration-300`}
                             >
                                 {t('findJobs')}
-                                <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-slate-900 text-white flex items-center justify-center group-hover:bg-white group-hover:text-amber-500 transition-all">
-                                    <ArrowRight className="w-3 h-3 md:w-4 md:h-4" />
+                                <div className="w-5 h-5 md:w-7 md:h-7 rounded-full bg-slate-900 text-white flex items-center justify-center group-hover:bg-white group-hover:text-amber-500 transition-all">
+                                    <ArrowRight className="w-2.5 h-2.5 md:w-3.5 md:h-3.5" />
                                 </div>
                             </Link>
                             <Link
                                 to="/employer-register"
-                                className="bg-slate-900/60 text-white border-2 border-white/30 px-8 md:px-12 py-3.5 md:py-5 rounded-full font-black text-xs md:text-base uppercase tracking-widest flex items-center justify-center gap-2 md:gap-3 hover:bg-white hover:text-amber-500 transition-all backdrop-blur-sm"
+                                className={`bg-slate-900/60 text-white border-2 border-white/30 ${isTamil ? 'px-6 md:px-8 py-3 md:py-3.5 text-[10px] md:text-xs' : 'px-7 md:px-9 py-3 md:py-4 text-[10px] md:text-sm'} rounded-full font-black uppercase tracking-widest flex items-center justify-center gap-2 md:gap-3 hover:bg-white hover:text-amber-500 transition-all backdrop-blur-sm`}
                             >
                                 {t('hireTalent')}
                             </Link>
@@ -139,7 +177,7 @@ const Home = () => {
             </section>
 
             {/* Stats Section: Contents Left, Image Right (Desktop) | Image Top, Row Stats (Mobile) */}
-            <div className="max-w-[1536px] mx-auto px-4 mt-6 sm:mt-12 md:mt-24 mb-10 md:mb-16 reveal-section">
+            <div className="max-w-[1536px] mx-auto px-4 mt-4 sm:mt-8 md:mt-12 mb-6 md:mb-8 reveal-section">
                 <div className="flex flex-col lg:flex-row items-center justify-between gap-4 lg:gap-20">
 
                     {/* Image: Top on Mobile, Right on Desktop */}
@@ -156,50 +194,66 @@ const Home = () => {
                         {/* Mobile Optimized Stats Row */}
                         <div className="lg:hidden grid grid-cols-4 gap-0.5 w-full max-w-[360px] mx-auto border-t border-slate-100 pt-4 mt-0">
                             <div className="text-center px-0.5 border-r border-slate-100">
-                                <h3 className="text-xs sm:text-base font-black text-slate-900 leading-none">120k+</h3>
+                                <h3 className="text-xs sm:text-base font-black text-slate-900 leading-none">
+                                    <CounterAnimated end={120} suffix="k+" />
+                                </h3>
                                 <p className="text-[5px] sm:text-[8px] font-bold text-amber-600 uppercase mt-1 leading-tight tracking-tighter whitespace-nowrap">{t('activeJobs').split(' ')[0]}</p>
                             </div>
                             <div className="text-center px-0.5 border-r border-slate-100">
-                                <h3 className="text-xs sm:text-base font-black text-slate-900 leading-none">14k+</h3>
+                                <h3 className="text-xs sm:text-base font-black text-slate-900 leading-none">
+                                    <CounterAnimated end={14} suffix="k+" />
+                                </h3>
                                 <p className="text-[5px] sm:text-[8px] font-bold text-amber-600 uppercase mt-1 leading-tight tracking-tighter whitespace-nowrap">{t('placements')}</p>
                             </div>
                             <div className="text-center px-0.5 border-r border-slate-100">
-                                <h3 className="text-xs sm:text-base font-black text-slate-900 leading-none">1.2k+</h3>
+                                <h3 className="text-xs sm:text-base font-black text-slate-900 leading-none">
+                                    <CounterAnimated end={1.2} suffix="k+" decimals={1} />
+                                </h3>
                                 <p className="text-[5px] sm:text-[8px] font-bold text-amber-600 uppercase mt-1 leading-tight tracking-tighter whitespace-nowrap">{t('companies')}</p>
                             </div>
                             <div className="text-center px-0.5">
-                                <h3 className="text-xs sm:text-base font-black text-slate-900 leading-none">10+</h3>
+                                <h3 className="text-xs sm:text-base font-black text-slate-900 leading-none">
+                                    <CounterAnimated end={10} suffix="+" />
+                                </h3>
                                 <p className="text-[5px] sm:text-[8px] font-bold text-amber-600 uppercase mt-1 leading-tight tracking-tighter whitespace-nowrap">YRS EXP</p>
                             </div>
                         </div>
 
-                        {/* Desktop Stats (2x2 Grid) */}
-                        <div className="hidden lg:grid grid-cols-2 gap-x-12 gap-y-16">
-                            <div>
-                                <h3 className="text-5xl xl:text-7xl font-black text-slate-900 leading-none">120k+</h3>
-                                <p className="text-xs font-bold text-amber-600 uppercase tracking-[0.25em] mt-3">{t('activeJobs')}</p>
+                        {/* Desktop Stats (2x2 Grid of Cards) */}
+                        <div className="hidden lg:grid grid-cols-2 gap-3 xl:gap-4">
+                            <div className="bg-white p-5 xl:p-6 rounded-[1.5rem] xl:rounded-[2rem] shadow-lg shadow-slate-200/50 border border-slate-100 hover:scale-105 transition-all duration-300 group text-center">
+                                <h3 className="text-2xl xl:text-3xl font-black text-slate-900 mb-1 leading-none">
+                                    <CounterAnimated end={120} suffix="k+" />
+                                </h3>
+                                <p className="text-[10px] font-black text-amber-600 uppercase tracking-widest group-hover:tracking-widest transition-all">{t('activeJobs')}</p>
                             </div>
-                            <div>
-                                <h3 className="text-5xl xl:text-7xl font-black text-slate-900 leading-none">14k+</h3>
-                                <p className="text-xs font-bold text-amber-600 uppercase tracking-[0.25em] mt-3">{t('placements')}</p>
+                            <div className="bg-white p-5 xl:p-6 rounded-[1.5rem] xl:rounded-[2rem] shadow-lg shadow-slate-200/50 border border-slate-100 hover:scale-105 transition-all duration-300 group text-center">
+                                <h3 className="text-2xl xl:text-3xl font-black text-slate-900 mb-1 leading-none">
+                                    <CounterAnimated end={14} suffix="k+" />
+                                </h3>
+                                <p className="text-[10px] font-black text-amber-600 uppercase tracking-widest group-hover:tracking-widest transition-all">{t('placements')}</p>
                             </div>
-                            <div>
-                                <h3 className="text-5xl xl:text-7xl font-black text-slate-900 leading-none">1.2k+</h3>
-                                <p className="text-xs font-bold text-amber-600 uppercase tracking-[0.25em] mt-3">{t('companies')}</p>
+                            <div className="bg-white p-5 xl:p-6 rounded-[1.5rem] xl:rounded-[2rem] shadow-lg shadow-slate-200/50 border border-slate-100 hover:scale-105 transition-all duration-300 group text-center">
+                                <h3 className="text-2xl xl:text-3xl font-black text-slate-900 mb-1 leading-none">
+                                    <CounterAnimated end={1.2} suffix="k+" decimals={1} />
+                                </h3>
+                                <p className="text-[10px] font-black text-amber-600 uppercase tracking-widest group-hover:tracking-widest transition-all">{t('companies')}</p>
                             </div>
-                            <div>
-                                <h3 className="text-5xl xl:text-7xl font-black text-slate-900 leading-none">10 Yrs+</h3>
-                                <p className="text-xs font-bold text-amber-600 uppercase tracking-[0.25em] mt-3">{t('experience')}</p>
+                            <div className="bg-white p-5 xl:p-6 rounded-[1.5rem] xl:rounded-[2rem] shadow-lg shadow-slate-200/50 border border-slate-100 hover:scale-105 transition-all duration-300 group text-center">
+                                <h3 className="text-2xl xl:text-3xl font-black text-slate-900 mb-1 leading-none">
+                                    <CounterAnimated end={10} suffix=" Yrs+" />
+                                </h3>
+                                <p className="text-[10px] font-black text-amber-600 uppercase tracking-widest group-hover:tracking-widest transition-all">{t('experience')}</p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             {/* Jobs by Category Section */}
-            <section className="py-8 md:py-24 reveal-section px-4">
+            <section className="py-6 md:py-12 reveal-section px-4">
                 <div className="max-w-[1536px] mx-auto">
                     {/* Header: Back to full width position */}
-                    <div className="flex flex-col sm:flex-row justify-between sm:items-end mb-12 md:mb-16 gap-6">
+                    <div className="flex flex-col sm:flex-row justify-between sm:items-end mb-8 md:mb-10 gap-6">
                         <div>
                             <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-slate-900 flex flex-wrap items-center gap-3 md:gap-4">
                                 <Sparkles className="w-5 h-5 md:w-8 md:h-8 text-amber-500 shrink-0" />
@@ -261,12 +315,12 @@ const Home = () => {
             <DistrictsSection />
 
             {/* Dynamic Job Listings */}
-            <section className="py-10 md:py-20 reveal-section px-4">
+            <section className="py-8 md:py-12 reveal-section px-4">
                 <div className="max-w-[1536px] mx-auto">
-                    <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 md:mb-16 gap-6">
+                    <div className="flex flex-col md:flex-row md:items-end justify-between mb-4 md:mb-8 gap-6">
                         <div className="space-y-4">
                             <div className="text-amber-500 font-bold text-sm uppercase tracking-widest">{t('opportunities')}</div>
-                            <h2 className="text-xl sm:text-2xl md:text-4xl font-extrabold text-slate-900 flex flex-wrap items-center gap-2 md:gap-4">
+                            <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-slate-900 flex flex-wrap items-center gap-2 md:gap-4">
                                 <TrendingUp className="w-6 h-6 md:w-10 md:h-10 text-amber-500 shrink-0" />
                                 <span>{t('jobsForYou').split(' ')[0]} <span className="text-amber-500">{t('jobsForYou').split(' ').slice(1).join(' ')}</span></span>
                             </h2>
@@ -346,46 +400,76 @@ const Home = () => {
                             </h3>
                         </div>
 
-                        {/* Large Image between text and cards */}
-                        <div className="flex justify-center mb-12 md:mb-20">
-                            <img src="/privatyejobimage.png" alt="Featured Private Jobs" className="max-w-4xl w-full h-auto object-contain" />
-                        </div>
-                        <div className="flex md:grid md:grid-cols-4 gap-4 md:gap-6 overflow-x-auto md:overflow-visible pb-6 md:pb-0 no-scrollbar">
-                            {jobs.filter(j => {
-                                const cat = j.category?.toLowerCase().trim();
-                                return cat === 'private' || (!cat && !j.govt_type);
-                            }).slice(0, 8).map((job) => (
-                                <Link
-                                    to={`/job/${slugify(job.title)}-${job.id}`}
-                                    key={job.id}
-                                    className="min-w-[240px] md:min-w-0 flex-1 bg-amber-100 p-4 md:p-5 group cursor-pointer border-2 border-amber-400/30 hover:border-amber-600 transition-all rounded-2xl relative shadow-md hover:shadow-xl"
-                                >
-                                    <div className="flex justify-between items-start mb-3 md:mb-4">
-                                        <div className="w-8 h-8 md:w-10 md:h-10 bg-white rounded-xl flex items-center justify-center transition-colors border border-amber-50 group-hover:bg-white shadow-sm overflow-hidden p-1">
-                                            <img src="/privatejoblogo.png" alt="Private Job" className="w-full h-full object-contain" />
-                                        </div>
-                                        <span className="text-[8px] md:text-[9px] bg-amber-500 text-white px-3 py-1 rounded-full font-bold uppercase tracking-widest">{job.job_type}</span>
-                                    </div>
-                                    <h3 className="text-sm md:text-base font-bold text-slate-900 mb-1 group-hover:text-amber-600 transition-colors uppercase tracking-tight line-clamp-1">{job.title}</h3>
-                                    <p className="text-[11px] md:text-xs font-bold text-slate-400 mb-2 md:mb-3">{job.company_name}</p>
+                        <div className="flex flex-col lg:flex-row items-center gap-4 lg:gap-12">
+                            {/* Left Side: Image */}
+                            <div className="w-full lg:w-[35%] flex justify-center order-1">
+                                <img 
+                                    src="/privatyejobimage.png" 
+                                    alt="Featured Private Jobs" 
+                                    className="w-full h-auto object-contain transform lg:scale-105" 
+                                />
+                            </div>
 
-                                    <div className="flex items-center gap-2 mb-4 text-slate-500">
-                                        <MapPin className="w-3.5 h-3.5 text-amber-500" />
-                                        <span className="text-[10px] font-bold uppercase tracking-widest">{t(`districtsList.${job.location}`) !== `districtsList.${job.location}` ? t(`districtsList.${job.location}`) : job.location}</span>
-                                    </div>
-                                    <div className="flex items-center justify-between pt-4 border-t border-amber-100">
-                                        <div>
-                                            <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest mb-0.5">{t('salary')}</p>
-                                            <p className="text-base font-black text-amber-600">₹ {formatIndianNumber(job.salary_range)}</p>
-                                        </div>
-                                        <div className="w-8 h-8 bg-amber-50 text-amber-600 rounded-lg group-hover:bg-amber-500 group-hover:text-white transition-all shadow-sm border border-amber-100 flex items-center justify-center">
-                                            <ArrowRight className="w-4 h-4" />
-                                        </div>
-                                    </div>
-                                </Link>
-                            ))}
+                            {/* Right Side: 6 Cards in 3 columns */}
+                            <div className="w-full lg:w-[65%] order-2 overflow-hidden px-1">
+                                <div className="flex lg:grid lg:grid-cols-3 sm:grid-cols-2 gap-3 md:gap-3.5 overflow-x-auto lg:overflow-visible pb-6 lg:pb-0 no-scrollbar">
+                                    {jobs.filter(j => {
+                                        const cat = j.category?.toLowerCase().trim();
+                                        return cat === 'private' || (!cat && !j.govt_type);
+                                    }).slice(0, 6).map((job) => (
+                                        <Link
+                                            to={`/job/${slugify(job.title)}-${job.id}`}
+                                            key={job.id}
+                                            className="min-w-[240px] lg:min-w-0 bg-amber-100 p-3 lg:p-3.5 group cursor-pointer border-2 border-amber-400/30 hover:border-amber-600 transition-all rounded-2xl relative shadow-md hover:shadow-xl"
+                                        >
+                                            <div className="flex justify-between items-start mb-2 md:mb-3">
+                                                <div className="w-8 h-8 md:w-9 md:h-9 bg-white rounded-xl flex items-center justify-center transition-colors border border-amber-50 group-hover:bg-white shadow-sm overflow-hidden p-1.5">
+                                                    <img src="/privatejoblogo.png" alt="Private Job" className="w-full h-full object-contain" />
+                                                </div>
+                                                <span className="text-[7px] md:text-[8px] bg-amber-500 text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">
+                                                    {job.job_type && job.job_type !== '-' ? job.job_type : 'Not Specified'}
+                                                </span>
+                                            </div>
+                                            <h3 className="text-[13px] md:text-[15px] font-black text-slate-900 mb-0.5 group-hover:text-amber-600 transition-colors uppercase tracking-tight line-clamp-1">{job.title}</h3>
+                                            <p className="text-[10px] md:text-[12px] font-bold text-slate-400 mb-2 md:mb-2">{job.company_name}</p>
+
+                                            <div className="grid grid-cols-2 gap-y-2 gap-x-2 mb-3">
+                                                <div className="flex items-center gap-1.5 text-slate-500 col-span-2">
+                                                    <MapPin className="w-3.5 h-3.5 text-amber-500" />
+                                                    <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-widest">{t(`districtsList.${job.location}`) !== `districtsList.${job.location}` ? t(`districtsList.${job.location}`) : job.location}</span>
+                                                </div>
+                                                <div className="flex items-center gap-1.5 text-slate-500">
+                                                    <Briefcase className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                                                    <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-tight truncate">{job.experience && job.experience !== '-' ? job.experience : 'Not Specified'}</span>
+                                                </div>
+                                                <div className="flex items-center gap-1.5 text-slate-500">
+                                                    <Clock className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+                                                    <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-tight truncate">{job.shift && job.shift !== '-' ? job.shift : 'Not Specified'}</span>
+                                                </div>
+                                                <div className="flex items-center gap-1.5 text-slate-500">
+                                                    <Globe className="w-3.5 h-3.5 text-purple-500 shrink-0" />
+                                                    <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-tight truncate">{job.work_mode && job.work_mode !== '-' ? job.work_mode : 'Not Specified'}</span>
+                                                </div>
+                                                <div className="flex items-center gap-1.5 text-slate-500">
+                                                    <Award className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                                                    <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-tight truncate">{job.qualification && job.qualification !== '-' ? job.qualification : 'Not Specified'}</span>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center justify-between pt-3 border-t border-amber-100">
+                                                <div>
+                                                    <p className="text-[8px] text-slate-400 font-black uppercase tracking-widest mb-0.5">{t('salary')}</p>
+                                                    <p className="text-sm md:text-base font-black text-amber-600">₹ {formatIndianNumber(job.salary_range)}</p>
+                                                </div>
+                                                <div className="w-7 h-7 bg-amber-50 text-amber-600 rounded-lg group-hover:bg-amber-500 group-hover:text-white transition-all shadow-sm border border-amber-100 flex items-center justify-center">
+                                                    <ArrowRight className="w-3.5 h-3.5" />
+                                                </div>
+                                            </div>
+                                        </Link>
+                                    ))}
+                                </div>
+                            </div>
                         </div>
-                        <div className="flex justify-center mt-10 md:mt-16">
+                        <div className="flex justify-center mt-4 md:mt-6">
                             <Link to="/jobs?type=private" className="bg-slate-900 text-white px-12 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-2xl hover:bg-amber-600 transition-all active:scale-95 flex items-center gap-4">
                                 View All Private Jobs <ArrowRight className="w-5 h-5" />
                             </Link>
@@ -402,15 +486,15 @@ const Home = () => {
             </section>
 
             {/* Simple Process */}
-            < section className="py-12 md:py-24 bg-slate-50 reveal-section px-4" >
+            < section className="py-8 md:py-12 bg-[#fffff4] reveal-section px-4" >
                 <div className="max-w-[1536px] mx-auto">
-                    <div className="text-center mb-10 md:mb-20">
+                    <div className="text-center mb-6 md:mb-10">
                         <h2 className="text-xl md:text-3xl font-extrabold text-slate-900 flex items-center justify-center gap-3 md:gap-4">
                             <CheckCircle className="w-8 h-8 md:w-10 md:h-10 text-amber-500" />
                             {t('hiringMadeEasy').split(' ')[0]} <span className="text-amber-500">{t('hiringMadeEasy').split(' ').slice(1).join(' ')}</span>
                         </h2>
                     </div>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 overflow-visible pb-6 md:pb-0">
+                    <div className="flex lg:grid lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8 pb-6 md:pb-0 overflow-x-auto lg:overflow-visible no-scrollbar snap-x snap-mandatory -mx-4 px-4 lg:mx-0 lg:px-0">
                         {/* Note: the steps n, t, d remain the same, just adding min-width for mobile scroll */}
                         {[
                             { n: '01', t: t('register'), d: t('registerDesc') },
@@ -418,8 +502,8 @@ const Home = () => {
                             { n: '03', t: t('interview'), d: t('interviewDesc') },
                             { n: '04', t: t('hired'), d: t('hiredDesc') }
                         ].map((step, i) => (
-                            <div key={i} className="w-full flex-1 bg-amber-50 border-2 border-amber-200 hover:border-amber-500 hover:bg-amber-100 p-3 md:p-8 rounded-2xl md:rounded-[2rem] shadow-sm hover:shadow-md relative overflow-hidden group transition-all">
-                                <div className="text-3xl md:text-6xl font-black text-amber-200/50 absolute -top-1 md:-top-3 -right-1 md:-right-3 group-hover:text-amber-200 transition-colors z-0">
+                            <div key={i} className="min-w-[280px] sm:min-w-[320px] lg:min-w-0 w-full bg-amber-50 border-2 border-amber-200 hover:border-amber-500 hover:bg-amber-100 p-5 md:p-6 lg:p-7 rounded-2xl md:rounded-[2rem] shadow-sm hover:shadow-md relative overflow-hidden group transition-all min-h-[160px] md:min-h-[180px] snap-center">
+                                <div className="text-3xl md:text-6xl font-black text-amber-500/10 absolute top-4 right-6 group-hover:text-amber-500/20 transition-colors z-0 pointer-events-none">
                                     {step.n}
                                 </div>
                                 <div className="relative z-10 space-y-2 md:space-y-3">
@@ -438,19 +522,19 @@ const Home = () => {
             <ReviewsSection />
 
             {/* Simple CTA - AMBER THEME */}
-            <section className="py-12 md:py-24 reveal-section px-4">
-                <div className="max-w-6xl mx-auto bg-amber-50 rounded-[2rem] md:rounded-[3.5rem] p-6 md:p-12 lg:p-20 text-center relative overflow-hidden shadow-md border-2 border-amber-200">
+            <section className="py-8 md:py-12 px-4">
+                <div className="max-w-4xl mx-auto bg-amber-50 rounded-[2rem] md:rounded-[3rem] p-8 md:p-12 lg:p-14 text-center relative overflow-hidden shadow-md border border-amber-200">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32 blur-3xl" />
                     <div className="relative z-10 px-2 lg:px-0">
-                        <h2 className="text-xl sm:text-3xl md:text-5xl font-extrabold text-slate-900 mb-3 md:mb-4 tracking-tight leading-tight uppercase">{t('readyToBegin')}</h2>
-                        <p className="text-slate-500 text-[13px] md:text-base max-w-xl mx-auto mb-6 md:mb-8 font-bold">
+                        <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-slate-900 mb-4 md:mb-6 tracking-tight leading-none uppercase">{t('readyToBegin')}</h2>
+                        <p className="text-slate-500 text-[13px] md:text-lg max-w-2xl mx-auto mb-8 md:mb-12 font-bold leading-relaxed">
                             {t('ctaDesc')}
                         </p>
                         <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center">
-                            <Link to="/employee-register" className="bg-white text-amber-500 px-8 py-3.5 md:px-10 md:py-4 rounded-xl font-bold text-sm md:text-base shadow-xl hover:scale-105 transition-transform">
+                            <Link to="/employee-register" className="bg-white text-amber-500 px-7 py-3 md:px-8 md:py-3.5 rounded-xl font-bold text-sm shadow-xl hover:scale-105 transition-transform">
                                 {t('joinAsSeeker')}
                             </Link>
-                            <Link to="/employer-register" className="bg-slate-900 text-white px-8 py-3.5 md:px-10 md:py-4 rounded-xl font-bold text-sm md:text-base shadow-xl hover:bg-black transition-all">
+                            <Link to="/employer-register" className="bg-slate-900 text-white px-7 py-3 md:px-8 md:py-3.5 rounded-xl font-bold text-sm shadow-xl hover:bg-black transition-all">
                                 {t('joinAsCompany')}
                             </Link>
                         </div>

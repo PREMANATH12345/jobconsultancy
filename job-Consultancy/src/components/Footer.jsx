@@ -8,7 +8,7 @@ const Footer = () => {
     const { t } = useLanguage();
 
     return (
-        <footer className="relative pt-24 pb-12 overflow-hidden bg-yellow-500">
+        <footer className="relative pt-24 pb-12 overflow-hidden bg-[#eab308]">
             {/* Decorative background element */}
             <div className="absolute top-0 left-0 w-96 h-96 bg-white/30 rounded-full blur-[100px] -ml-40 -mt-40" />
 

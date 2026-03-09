@@ -185,8 +185,14 @@ const JobListing = () => {
             >
                 <div className="relative z-10">
                     <div className="flex justify-between items-start mb-3 md:mb-4">
-                        <div className={`w-8 h-8 md:w-10 md:h-10 bg-white/20 rounded-lg md:rounded-xl flex items-center justify-center p-2 md:p-2.5 transition-colors border ${isGovernment ? 'border-white/20' : 'border-pink-100'}`}>
-                            {isGovernment ? <Landmark className={`w-full h-full text-white`} /> : <Briefcase className={`w-full h-full text-pink-600`} />}
+                        <div className={`w-8 h-8 md:w-10 md:h-10 bg-white/20 rounded-lg md:rounded-xl flex items-center justify-center p-0 overflow-hidden transition-colors border ${isGovernment ? 'border-white/20' : 'border-pink-100'}`}>
+                            {job.company_logo ? (
+                                <img src={job.company_logo} alt="Company Logo" className="w-full h-full object-contain bg-white" />
+                            ) : (
+                                <div className="p-2 md:p-2.5 w-full h-full flex items-center justify-center">
+                                    {isGovernment ? <Landmark className={`w-full h-full text-white`} /> : <Briefcase className={`w-full h-full text-pink-600`} />}
+                                </div>
+                            )}
                         </div>
                         <div className="flex flex-col items-end gap-1">
                             <span className={`text-[8px] md:text-[10px] font-black px-2 md:py-1 rounded-full capitalize shadow-md ${isGovernment ? 'bg-slate-900 text-white' : 'bg-pink-600 text-white'}`}>
@@ -236,7 +242,7 @@ const JobListing = () => {
     };
 
     return (
-        <div className="pt-32 pb-20 px-4 min-h-screen bg-slate-50">
+        <div className="pt-32 pb-20 px-4 min-h-screen bg-[#fffff4]">
             <div className="max-w-[1536px] mx-auto">
                 <button
                     onClick={() => navigate(-1)}

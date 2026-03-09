@@ -152,20 +152,20 @@ const ManageJobs = () => {
 
                         return {
                             id: app.id,
-                            applied_date: new Date(app.created_at).toLocaleDateString(),
+                            applied_date: new Date(app.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
                             status: app.status || 'applied',
                             candidate_name: candidate?.name || 'N/A',
                             candidate_email: candidate?.email || 'N/A',
-                            candidate_phone: details?.phone || candidate?.phone || 'N/A',
-                            whatsapp: details?.whatsapp || 'N/A',
-                            gender: details?.gender || 'N/A',
-                            dob: details?.dob || 'N/A',
-                            location: details?.location || 'N/A',
+                            candidate_phone: candidate?.phone || 'N/A',
+                            whatsapp: candidate?.whatsapp_no || candidate?.phone || 'N/A',
+                            gender: details?.gender || candidate?.gender || 'N/A',
+                            dob: details?.dob ? new Date(details.dob).toLocaleDateString('en-GB') : 'N/A',
+                            location: details?.address?.district || details?.address?.city || details?.location || 'N/A',
                             education: details?.education || 'N/A',
                             experience_type: details?.experience?.type || 'Fresher',
-                            designation: details?.experience?.designation || 'N/A',
-                            years_exp: details?.experience?.years || '0',
-                            last_salary: details?.experience?.lastSalary || 'N/A',
+                            designation: details?.experience?.type === 'Experienced' ? (details?.experience?.designation || 'N/A') : 'N/A',
+                            years_exp: details?.experience?.type === 'Experienced' ? (details?.experience?.years || '0') : '0',
+                            last_salary: details?.experience?.type === 'Experienced' ? (details?.experience?.lastSalary || 'N/A') : 'N/A',
                             expected_salary: details?.expectations?.expectedSalary || 'N/A',
                             preferred_spot: details?.expectations?.workPlace || 'N/A',
                             desired_role: details?.expectations?.job || 'N/A',
@@ -202,7 +202,7 @@ const ManageJobs = () => {
             ];
 
             const rows = enrichedData.map(d => [
-                d.applied_date,
+                `="${d.applied_date}"`,
                 d.job_title,
                 d.category,
                 d.candidate_name,
@@ -210,7 +210,7 @@ const ManageJobs = () => {
                 `="${d.candidate_phone}"`,
                 `="${d.whatsapp}"`,
                 d.gender,
-                d.dob,
+                `="${d.dob}"`,
                 d.location,
                 d.education,
                 d.experience_type,
@@ -433,24 +433,11 @@ const ManageJobs = () => {
                     <div className="relative flex-1">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                         <input
-                            placeholder={view === 'employers' ? "Find Employer..." : "Search Jobs..."}
+                            placeholder={view === 'employers' ? "Find Employer..." : view === 'applicants' ? "Search Candidates..." : "Search Jobs..."}
                             className="w-full pl-10 pr-4 py-3 rounded-2xl border border-slate-100 text-sm font-bold outline-none focus:border-emerald-500 transition-all bg-slate-50"
                             value={filterEmployer}
                             onChange={(e) => setFilterEmployer(e.target.value)}
                         />
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                        {/* Removed Any Category filter as requested */}
-                        <select
-                            className="flex-1 lg:flex-none px-4 py-3 rounded-xl border border-slate-100 text-xs font-bold uppercase tracking-wider outline-none focus:border-emerald-500 cursor-pointer shadow-sm hover:bg-slate-50 transition-colors"
-                            value={filterStatus}
-                            onChange={(e) => setFilterStatus(e.target.value)}
-                        >
-                            <option value="all">Any Status</option>
-                            <option value="pending">Pending</option>
-                            <option value="approved">Approved</option>
-                            <option value="rejected">Rejected</option>
-                        </select>
                     </div>
                 </div>
             </div>
@@ -638,7 +625,7 @@ const ManageJobs = () => {
                                     <h2 className="text-2xl md:text-4xl font-extrabold uppercase tracking-tighter leading-none mb-3">Applicants Queue</h2>
                                     <div className="flex flex-wrap justify-center md:justify-start gap-3">
                                         <span className="bg-emerald-500/20 text-emerald-400 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider border border-emerald-500/20">{selectedJobForApplicants?.title}</span>
-                                        <span className="bg-white/5 text-slate-400 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider border border-white/5">{applications.filter(app => String(app.job_id) === String(selectedJobForApplicants.id)).length} Candidates Found</span>
+                                        <span className="bg-white/5 text-slate-400 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider border border-white/5">{applications.filter(app => String(app.job_id) === String(selectedJobForApplicants?.id)).filter(app => !filterEmployer || app.user_name?.toLowerCase().includes(filterEmployer.toLowerCase()) || app.user_email?.toLowerCase().includes(filterEmployer.toLowerCase())).length} Candidates Found</span>
                                     </div>
                                 </div>
                             </div>
@@ -666,7 +653,7 @@ const ManageJobs = () => {
                             </h4>
 
                             <div className="space-y-0 border-t border-slate-100">
-                                {applications.filter(app => String(app.job_id) === String(selectedJobForApplicants.id)).map(app => (
+                                {applications.filter(app => String(app.job_id) === String(selectedJobForApplicants?.id)).filter(app => !filterEmployer || app.user_name?.toLowerCase().includes(filterEmployer.toLowerCase()) || app.user_email?.toLowerCase().includes(filterEmployer.toLowerCase())).map(app => (
                                     <div key={app.id} className="py-8 md:py-12 border-b border-slate-100 flex flex-col sm:flex-row items-center justify-between group hover:bg-slate-50/50 px-4 md:px-8 transition-all gap-8 -mx-4 md:-mx-8 rounded-3xl">
                                         <div className="flex items-center gap-6 md:gap-10 w-full sm:w-auto text-left">
                                             <div className="w-16 h-16 md:w-20 md:h-20 rounded-[1.5rem] bg-slate-900 flex items-center justify-center text-white font-black text-xl md:text-2xl uppercase border-4 border-white shadow-xl shrink-0 group-hover:rotate-3 transition-transform">
@@ -735,7 +722,7 @@ const ManageJobs = () => {
                                     </div>
                                 ))}
 
-                                {applications.filter(app => String(app.job_id) === String(selectedJobForApplicants.id)).length === 0 && (
+                                {applications.filter(app => String(app.job_id) === String(selectedJobForApplicants?.id)).filter(app => !filterEmployer || app.user_name?.toLowerCase().includes(filterEmployer.toLowerCase()) || app.user_email?.toLowerCase().includes(filterEmployer.toLowerCase())).length === 0 && (
                                     <div className="py-20 text-center">
                                         <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
                                             <Users className="w-10 h-10 text-slate-200" />

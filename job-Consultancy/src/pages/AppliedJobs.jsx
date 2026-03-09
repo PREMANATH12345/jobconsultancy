@@ -15,7 +15,7 @@ const AppliedJobs = ({ hideHeader = false }) => {
     const [reviewData, setReviewData] = useState({ rating: 5, comment: '' });
     const [submittingReview, setSubmittingReview] = useState(false);
 
-    const user = JSON.parse(localStorage.getItem('user'));
+    const user = JSON.parse(sessionStorage.getItem('user'));
 
     useEffect(() => {
         if (!user || user.role !== 'employee') {
@@ -258,7 +258,7 @@ const AppliedJobs = ({ hideHeader = false }) => {
                                 <div className="space-y-4">
                                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Your Detailed Feedback</label>
                                     <div className="relative">
-                                        <MessageSquare className="absolute left-6 top-6 w-5 h-5 text-slate-300" />
+                                        
                                         <textarea
                                             placeholder="Tell us about the interview process, company culture, or overall experience..."
                                             className="w-full bg-slate-50 border border-slate-100 rounded-3xl p-6 pl-14 min-h-[150px] outline-none focus:border-amber-500/30 transition-all font-bold text-sm text-slate-700 leading-relaxed"

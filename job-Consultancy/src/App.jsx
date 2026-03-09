@@ -143,7 +143,7 @@ function App() {
     <BrowserRouter>
       <ScrollToTop />
       <Toaster
-        position="top-center"
+        position="top-right"
         toastOptions={{
           style: {
             background: '#ffffff',

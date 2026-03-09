@@ -58,7 +58,7 @@ const DistrictJobs = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50">
+        <div className="min-h-screen bg-[#fffff4]">
             {/* Professional Banner */}
             <div className="relative h-[400px] lg:h-[500px] w-full overflow-hidden">
                 <img

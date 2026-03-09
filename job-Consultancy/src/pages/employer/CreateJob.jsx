@@ -18,7 +18,7 @@ const CreateJob = () => {
     const [subStep, setSubStep] = useState(1); // Added as per instruction
     const [loading, setLoading] = useState(false);
     const [fetching, setFetching] = useState(false);
-    const user = JSON.parse(localStorage.getItem('user')) || {};
+    const user = JSON.parse(sessionStorage.getItem('user')) || {};
 
     // Selection Step: 'loading', 'pricing', 'select', 'govt', 'private'
     const [step, setStep] = useState('loading');
@@ -394,7 +394,7 @@ const CreateJob = () => {
             if (userData && userData[0]) {
                 autoApprove = userData[0].auto_approve_jobs;
                 const freshUser = { ...user, auto_approve_jobs: autoApprove };
-                localStorage.setItem('user', JSON.stringify(freshUser));
+                sessionStorage.setItem('user', JSON.stringify(freshUser));
             }
         } catch (e) {
             console.error("Failed to fetch fresh user data for auto-approve check", e);

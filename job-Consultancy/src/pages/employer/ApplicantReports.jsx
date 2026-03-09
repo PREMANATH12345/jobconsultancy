@@ -28,7 +28,7 @@ const ApplicantReports = () => {
     const [exportingId, setExportingId] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
 
-    const user = JSON.parse(localStorage.getItem('user'));
+    const user = JSON.parse(sessionStorage.getItem('user'));
 
     useEffect(() => {
         fetchJobs();
@@ -81,20 +81,20 @@ const ApplicantReports = () => {
 
                         return {
                             id: app.id,
-                            applied_date: new Date(app.created_at).toLocaleDateString(),
+                            applied_date: new Date(app.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
                             status: app.status || 'applied',
                             candidate_name: candidate?.name || 'N/A',
                             candidate_email: candidate?.email || 'N/A',
-                            candidate_phone: details?.phone || candidate?.phone || 'N/A',
-                            whatsapp: details?.whatsapp || 'N/A',
-                            gender: details?.gender || 'N/A',
-                            dob: details?.dob || 'N/A',
-                            location: details?.location || 'N/A',
+                            candidate_phone: candidate?.phone || 'N/A',
+                            whatsapp: candidate?.whatsapp_no || candidate?.phone || 'N/A',
+                            gender: details?.gender || candidate?.gender || 'N/A',
+                            dob: details?.dob ? new Date(details.dob).toLocaleDateString('en-GB') : 'N/A',
+                            location: details?.address?.district || details?.address?.city || details?.location || 'N/A',
                             education: details?.education || 'N/A',
                             experience_type: details?.experience?.type || 'Fresher',
-                            designation: details?.experience?.designation || 'N/A',
-                            years_exp: details?.experience?.years || '0',
-                            last_salary: details?.experience?.lastSalary || 'N/A',
+                            designation: details?.experience?.type === 'Experienced' ? (details?.experience?.designation || 'N/A') : 'N/A',
+                            years_exp: details?.experience?.type === 'Experienced' ? (details?.experience?.years || '0') : '0',
+                            last_salary: details?.experience?.type === 'Experienced' ? (details?.experience?.lastSalary || 'N/A') : 'N/A',
                             expected_salary: details?.expectations?.expectedSalary || 'N/A',
                             preferred_spot: details?.expectations?.workPlace || 'N/A',
                             desired_role: details?.expectations?.job || 'N/A',
@@ -131,15 +131,15 @@ const ApplicantReports = () => {
             ];
 
             const rows = enrichedData.map(d => [
-                d.applied_date,
+                `="${d.applied_date}"`,
                 d.job_title,
                 d.category,
                 d.candidate_name,
                 d.candidate_email,
-                `="${d.candidate_phone}"`, // Force Excel to treat as text to keep leading zeros
+                `="${d.candidate_phone}"`,
                 `="${d.whatsapp}"`,
                 d.gender,
-                d.dob,
+                `="${d.dob}"`,
                 d.location,
                 d.education,
                 d.experience_type,
